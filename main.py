@@ -23,6 +23,8 @@ cd = ColorDescriptor((8, 12, 3))
 with open(args["index"], "w") as index_file:
     for image_path in glob.glob(args["dataset"] + "/*.jpg"):
         image_name = image_path.split("/")[-1]
+
+        print(f"INFO: Processing \'{image_name}\'...")
         image = cv2.imread(image_path)
 
         features = cd.describe(image)
