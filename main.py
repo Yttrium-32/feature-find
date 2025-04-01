@@ -20,11 +20,8 @@ args = vars(ap.parse_args())
 
 cd = ColorDescriptor((8, 12, 3))
 
-print(f"{args['dataset']=}")
-
 with open(args["index"], "w") as index_file:
     for image_path in glob.glob(args["dataset"] + "/*.jpg"):
-        print(f"{image_path=}")
         image_name = image_path.split("/")[-1]
         image = cv2.imread(image_path)
 
