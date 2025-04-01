@@ -3,7 +3,7 @@ import cv2
 import imutils
 
 class ColorDescriptor:
-    def __init__(self, bins: tuple[int]):
+    def __init__(self, bins: tuple[int, int, int]):
         self.bins = bins
 
     def histogarm(self, image, mask):
