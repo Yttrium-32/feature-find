@@ -30,4 +30,4 @@ with open(args["index"], "w") as index_file:
         features = cd.describe(image)
 
         features = [str(f) for f in features]
-        index_file.write(f"{image_name},{','.join(features)}")
+        index_file.write(f"{image_name},{','.join(features)}\n")
