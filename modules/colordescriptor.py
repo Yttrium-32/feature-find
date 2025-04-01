@@ -3,54 +3,54 @@ import cv2
 import imutils
 
 class ColorDescriptor:
-    def __init__(self, bins):
+    def __init__(self, bins: tuple[int]):
         self.bins = bins
 
-        def histogarm(self, image, mask):
-            hist = cv2.calcHist(
-                    [image],
-                    [0, 1, 2],
-                    mask,
-                    self.bins,
-                    [0, 180, 0, 256, 0, 256]
+    def histogarm(self, image, mask):
+        hist = cv2.calcHist(
+                [image],
+                [0, 1, 2],
+                mask,
+                self.bins,
+                [0, 180, 0, 256, 0, 256]
+        )
+
+        if imutils.is_cv2():
+            hist = cv2.normalize(hist).flatten()
+        else:
+            hist = cv2.normalize(hist, hist).flatten()
+
+        return hist
+
+    def describe(self, image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        features = []
+
+        (h,w) = image.shape[:2]
+        (cX, cY) = (int(w * 0.5), int(h * 0.5))
+
+        segments = [(0, cX, 0, cY), (cX, w, 0, cY), (cX, w, cY, h), (0, cX, cY, h)]
+
+        axesX, axesY = (int(w * 0.75) // 2, int(h * 0.75) // 2)
+
+        ellippMask = numpy.zeros(image.shape[:2], dtype='uint8')
+        cv2.ellipse(ellippMask, (cX, cY), (axesX, axesY), 0, 0, 360, 255, -1)
+
+        for (startX, endX, startY, endY) in segments:
+            cornerMask = numpy.zeros(image.shape[:2], dtype='uint8')
+            cv2.rectangle(
+                    cornerMask,
+                    (startX, startY),
+                    (endX, endY),
+                    255, -1
             )
-
-            if imutils.imutils.is_cv2():
-                hist = cv2.normalize(hist).flatten()
-            else:
-                hist = cv2.normalize(hist, hist).flatten()
-
-            return hist
-
-        def describe(self, image):
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-            features = []
-
-            (h,w) = image.shape[:2]
-            (cX, cY) = (int(w * 0.5), int(h * 0.5))
-
-            segments = [(0, cX, 0, cY), (cX, w, 0, cY), (cX, w, cY, h), (0, cX, cY, h)]
-
-            axesX, axesY = (int(w * 0.75) // 2, int(h * 0.75) // 2)
-
-            ellippMask = numpy.zeros(image.shape[:2], dtype='uint8')
-            cv2.ellipse(ellippMask, (cX, cY), (axesX, axesY), 0, 0, 360, 255, -1)
-
-            for (startX, endX, startY, endY) in segments:
-                cornerMask = numpy.zeros(image.shape[:2], dtype='uint8')
-                cv2.rectangle(
-                        cornerMask,
-                        (startX, startY),
-                        (endX, endY),
-                        255, -1
-                )
-                cornerMask = cv2.subtract(cornerMask, ellippMask)
-
-                hist = self.histogarm(image, ellippMask)
-                features.extend(hist)
+            cornerMask = cv2.subtract(cornerMask, ellippMask)
 
             hist = self.histogarm(image, ellippMask)
             features.extend(hist)
 
-            return features
+        hist = self.histogarm(image, ellippMask)
+        features.extend(hist)
+
+        return features
 
