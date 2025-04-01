@@ -14,3 +14,8 @@ photos/
 
 # index file
 index.csv
+
+# Django
+*.log
+*.pot
+db.sqlite3
