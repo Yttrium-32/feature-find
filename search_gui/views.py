@@ -25,12 +25,14 @@ def search_gui(request: HttpRequest):
         clr_dsc = ColorDescriptor((8, 12, 3))
         searcher = Searcher(
                 MEDIA_ROOT.__str__(),
+                BASE_DIR / "index.csv",
                 clr_dsc
         )
 
         features = clr_dsc.describe(query)
         results = searcher.search(features)
 
+        print(f"DEBUG: {BASE_DIR / 'index.csv'}")
         for (result_id, score) in results:
             print(f"DEBUG: {result_id=}, {score=}")
             matched_photos.append(f"{MEDIA_URL}{result_id}")
