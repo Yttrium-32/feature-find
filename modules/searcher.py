@@ -3,10 +3,10 @@ from modules.feature_extractor import FeatureExtractor
 from modules.index import Indexer
 
 from sklearn.metrics.pairwise import cosine_similarity
-
 import cv2
 import numpy
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import argparse
 import csv
 import os
@@ -23,35 +23,36 @@ class Searcher:
         if not os.path.isfile(self.index_path):
             indexer.index_images(self.photo_dir, self.index_path)
 
-    def chi2_distance(self, hist_a, hist_b, eps = 1e-10):
-        d = 0.5 * numpy.sum([
-                ((a - b) ** 2) / (a + b + eps)
-                for (a,b) in zip(hist_a, hist_b)
-        ])
+    def compute_cos_sim(self, row, query_features):
+        features = [float(x) for x in row[1:]]
 
-        return d
+        vec_db = numpy.array(features).reshape(1, -1)
+        vec_query = numpy.array(query_features).reshape(1, -1)
+
+        d = cosine_similarity(vec_db, vec_query)[0][0]
+
+        if d > 0.5:
+            return (row[0], d)
+        return None
+
 
     def search(self, query_features, limit: int = 10):
-        results = dict()
+        results = []
 
         with open(self.index_path) as index_file:
             csv_file = csv.reader(index_file)
 
-            for row in csv_file:
-                features = [float(x) for x in row[1:]]
+            with ThreadPoolExecutor() as executor:
+                futures = [
+                    executor.submit(self.compute_cos_sim, row, query_features)
+                    for row in csv_file
+                ]
+                for future in as_completed(futures):
+                    res = future.result()
+                    if res:
+                        results.append(res)
 
-                vec_db = numpy.array(features).reshape(1, -1)
-                vec_query = numpy.array(query_features).reshape(1, -1)
-
-                d = cosine_similarity(vec_db, vec_query)[0][0]
-
-                if d < 0.5:
-                    continue
-
-                results[row[0]] = d
-
-        results = sorted(results.items(), key=lambda item: item[1], reverse=True)
-
+        results.sort(key=lambda item: item[1], reverse=True)
         return results[:limit]
 
 if __name__ == "__main__":
