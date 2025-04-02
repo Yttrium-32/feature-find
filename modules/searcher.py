@@ -1,5 +1,5 @@
 from image_matcher.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
-from modules.colordescriptor import ColorDescriptor
+from modules.feature_extractor import FeatureExtractor
 from modules.index import Indexer
 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     matched_photos = []
 
     bins = (8, 12, 3)
-    clr_dsc = ColorDescriptor(bins)
+    clr_dsc = FeatureExtractor(bins)
     searcher = Searcher(
             MEDIA_ROOT.__str__(),
             BASE_DIR / "index.csv",

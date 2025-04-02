@@ -1,4 +1,4 @@
-from modules.colordescriptor import ColorDescriptor
+from modules.feature_extractor import FeatureExtractor
 from modules.searcher import Searcher
 from image_matcher.settings import BASE_DIR, MEDIA_ROOT
 
@@ -21,7 +21,7 @@ def main() -> None:
 
     args = vars(ap.parse_args())
 
-    clr_dsc = ColorDescriptor((8, 12, 3))
+    clr_dsc = FeatureExtractor((8, 12, 3))
 
     query = cv2.imread(args["query"])
     features = clr_dsc.describe(query)

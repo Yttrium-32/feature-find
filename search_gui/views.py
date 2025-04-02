@@ -5,7 +5,7 @@ from django.http import HttpRequest
 from django.core.files.storage import FileSystemStorage
 
 from modules.searcher import Searcher
-from modules.colordescriptor import ColorDescriptor
+from modules.feature_extractor import FeatureExtractor
 
 from image_matcher.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
 
@@ -23,7 +23,7 @@ def search_gui(request: HttpRequest):
         query = cv2.imread(saved_image_path)
 
         bins = (8, 12, 3)
-        clr_dsc = ColorDescriptor(bins)
+        clr_dsc = FeatureExtractor(bins)
         searcher = Searcher(
                 MEDIA_ROOT.__str__(),
                 BASE_DIR / "index.csv",

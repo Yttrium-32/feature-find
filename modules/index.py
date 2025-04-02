@@ -1,53 +1,33 @@
-import concurrent.futures
-from typing import List
-
-from modules.colordescriptor import ColorDescriptor
+from modules.feature_extractor import FeatureExtractor
 
 import argparse
 import glob
 import cv2
 
 class Indexer:
-    def __init__(self, bins: tuple[int, int, int]) -> None:
-        self.bins = bins
+    def __init__(self) -> None:
+        self.feature_extractor = FeatureExtractor()
 
     def index_images(self, photos_dir: str, index_file_path: str) -> None:
-        image_paths = glob.glob(photos_dir + "/*.jpg")
-        count = 0
-        buffer: List[str] = []
-
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures = [
-                executor.submit(self.process_image, path)
-                for path in image_paths
-            ]
-
-            for future in concurrent.futures.as_completed(futures):
-                line = future.result()
-                buffer.append(line)
-                count += 1
-
         with open(index_file_path, "w") as index_file:
-            index_file.writelines(buffer)
-
-        print(f"INFO: Indexed {count} files")
+            for image_path in glob.glob(photos_dir + "/*.jpg"):
+                feature_arr = self.process_image(image_path)
+                index_file.write(feature_arr)
 
     def process_image(self, image_path: str) -> str:
-        color_desc = ColorDescriptor(self.bins)
         image_name = image_path.split("/")[-1]
 
         print(f"INFO: Processing \'{image_name}\'...")
-        image = cv2.imread(image_path)
 
-        features = color_desc.describe(image)
+        image = cv2.imread(image_path)
+        features = self.feature_extractor.describe(image)
 
         features = [str(f) for f in features]
 
         return f"{image_name},{','.join(features)}\n"
 
-
 if __name__ == "__main__":
-    indexer = Indexer((8, 12, 3))
+    indexer = Indexer()
 
     ap = argparse.ArgumentParser()
     ap.add_argument(
