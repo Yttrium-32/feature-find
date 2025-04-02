@@ -22,12 +22,10 @@ def search_gui(request: HttpRequest):
         saved_image_path = fs.path(filename)
         query = cv2.imread(saved_image_path)
 
-        bins = (8, 12, 3)
         feature_extractor = FeatureExtractor()
         searcher = Searcher(
                 MEDIA_ROOT.__str__(),
                 BASE_DIR / "index.csv",
-                bins
         )
 
         features = feature_extractor.describe(query)
