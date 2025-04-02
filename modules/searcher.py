@@ -10,13 +10,13 @@ import csv
 import os
 
 class Searcher:
-    def __init__(self, photo_dir: str, index_path: str, clr_dsc: ColorDescriptor) -> None:
+    def __init__(self, photo_dir: str, index_path: str, bins: tuple[int, int, int]) -> None:
         self.index_path = index_path
         self.photo_dir = photo_dir
-        self.init_index(clr_dsc)
+        self.init_index(bins)
 
-    def init_index(self, clr_dsc: ColorDescriptor) -> None:
-        indexer = Indexer(clr_dsc)
+    def init_index(self, bins: tuple[int, int, int]) -> None:
+        indexer = Indexer(bins)
 
         if not os.path.isfile(self.index_path):
             indexer.index_images(self.photo_dir, self.index_path)
@@ -58,11 +58,12 @@ if __name__ == "__main__":
     query = cv2.imread(args["query"])
     matched_photos = []
 
-    clr_dsc = ColorDescriptor((8, 12, 3))
+    bins = (8, 12, 3)
+    clr_dsc = ColorDescriptor(bins)
     searcher = Searcher(
             MEDIA_ROOT.__str__(),
             BASE_DIR / "index.csv",
-            clr_dsc
+            bins
     )
 
     features = clr_dsc.describe(query)

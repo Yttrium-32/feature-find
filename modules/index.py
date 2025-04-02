@@ -8,8 +8,8 @@ import glob
 import cv2
 
 class Indexer:
-    def __init__(self, color_desc_tup: tuple[int, int, int]) -> None:
-        self.color_desc_tup = color_desc_tup
+    def __init__(self, bins: tuple[int, int, int]) -> None:
+        self.bins = bins
 
     def index_images(self, photos_dir: str, index_file_path: str) -> None:
         image_paths = glob.glob(photos_dir + "/*.jpg")
@@ -33,7 +33,7 @@ class Indexer:
         print(f"INFO: Indexed {count} files")
 
     def process_image(self, image_path: str) -> str:
-        color_desc = ColorDescriptor(self.color_desc_tup)
+        color_desc = ColorDescriptor(self.bins)
         image_name = image_path.split("/")[-1]
 
         print(f"INFO: Processing \'{image_name}\'...")

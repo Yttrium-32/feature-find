@@ -22,11 +22,12 @@ def search_gui(request: HttpRequest):
         saved_image_path = fs.path(filename)
         query = cv2.imread(saved_image_path)
 
-        clr_dsc = ColorDescriptor((8, 12, 3))
+        bins = (8, 12, 3)
+        clr_dsc = ColorDescriptor(bins)
         searcher = Searcher(
                 MEDIA_ROOT.__str__(),
                 BASE_DIR / "index.csv",
-                clr_dsc
+                bins
         )
 
         features = clr_dsc.describe(query)
