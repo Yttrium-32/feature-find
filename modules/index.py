@@ -1,3 +1,6 @@
+import concurrent.futures
+from typing import List
+
 from modules.colordescriptor import ColorDescriptor
 
 import argparse
@@ -5,26 +8,46 @@ import glob
 import cv2
 
 class Indexer:
-    def __init__(self, color_desc: ColorDescriptor) -> None:
-        self.color_desc = color_desc
+    def __init__(self, color_desc_tup: tuple[int, int, int]) -> None:
+        self.color_desc_tup = color_desc_tup
 
     def index_images(self, photos_dir: str, index_file_path: str) -> None:
+        image_paths = glob.glob(photos_dir + "/*.jpg")
+        count = 0
+        buffer: List[str] = []
+
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = [
+                executor.submit(self.process_image, path)
+                for path in image_paths
+            ]
+
+            for future in concurrent.futures.as_completed(futures):
+                line = future.result()
+                buffer.append(line)
+                count += 1
 
         with open(index_file_path, "w") as index_file:
-            for image_path in glob.glob(photos_dir + "/*.jpg"):
-                image_name = image_path.split("/")[-1]
+            index_file.writelines(buffer)
 
-                print(f"INFO: Processing \'{image_name}\'...")
-                image = cv2.imread(image_path)
+        print(f"INFO: Indexed {count} files")
 
-                features = self.color_desc.describe(image)
+    def process_image(self, image_path: str) -> str:
+        color_desc = ColorDescriptor(self.color_desc_tup)
+        image_name = image_path.split("/")[-1]
 
-                features = [str(f) for f in features]
-                index_file.write(f"{image_name},{','.join(features)}\n")
+        print(f"INFO: Processing \'{image_name}\'...")
+        image = cv2.imread(image_path)
+
+        features = color_desc.describe(image)
+
+        features = [str(f) for f in features]
+
+        return f"{image_name},{','.join(features)}\n"
+
 
 if __name__ == "__main__":
-    clr_dsc = ColorDescriptor((8, 12, 3))
-    indexer = Indexer(clr_dsc)
+    indexer = Indexer((8, 12, 3))
 
     ap = argparse.ArgumentParser()
     ap.add_argument(
