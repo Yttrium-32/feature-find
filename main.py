@@ -1,12 +1,14 @@
 from modules.colordescriptor import ColorDescriptor
 from modules.searcher import Searcher
-from image_matcher.settings import STATIC_URL
+from image_matcher.settings import BASE_DIR, MEDIA_ROOT
 
 import argparse
 import cv2
 
-import os
 import time
+
+INDEX_PATH: str = (BASE_DIR / "index.csv").__str__()
+PHOTO_PATH: str = MEDIA_ROOT.__str__()
 
 def main() -> None:
     ap = argparse.ArgumentParser()
@@ -24,13 +26,18 @@ def main() -> None:
     query = cv2.imread(args["query"])
     features = clr_dsc.describe(query)
 
-    searcher = Searcher(STATIC_URL, STATIC_URL + "index.csv", clr_dsc)
+    print(f"{PHOTO_PATH=}")
+    searcher = Searcher(
+            PHOTO_PATH,
+            INDEX_PATH,
+            clr_dsc
+    )
     results = searcher.search(features)
 
-    icat = "kitty +kitten icat"
-    for (_, result_id) in results:
-        os.system(f"{icat} {STATIC_URL}{result_id}")
+    for (result_id, dist) in results:
+        print(f"{PHOTO_PATH}/{result_id}: {dist}")
         time.sleep(1)
 
 if __name__ == "__main__":
     main()
+

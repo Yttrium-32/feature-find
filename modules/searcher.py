@@ -38,7 +38,7 @@ class Searcher:
 
                 results[row[0]] = d
 
-        results = sorted([(v, k) for (k, v) in results.items()])
+        results = sorted(results.items(), key=lambda item: item[0])
 
         return results[:limit]
 

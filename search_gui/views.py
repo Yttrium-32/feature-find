@@ -33,9 +33,8 @@ def search_gui(request: HttpRequest):
         results = searcher.search(features)
 
         print(f"DEBUG: {BASE_DIR / 'index.csv'}")
-        print(f"DEBUG: {results=}")
-        for (_, result_id) in results:
-            print(f"DEBUG: {result_id=}")
+        for (result_id, score) in results:
+            print(f"DEBUG: {result_id=}, {score=}")
             matched_photos.append(f"{MEDIA_URL}{result_id}")
 
         print(f"DEBUG: {matched_photos=}")
@@ -44,3 +43,4 @@ def search_gui(request: HttpRequest):
         'uploaded_image_url': uploaded_image,
         'result_images': matched_photos
     })
+
