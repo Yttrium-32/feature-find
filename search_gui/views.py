@@ -23,14 +23,14 @@ def search_gui(request: HttpRequest):
         query = cv2.imread(saved_image_path)
 
         bins = (8, 12, 3)
-        clr_dsc = FeatureExtractor(bins)
+        feature_extractor = FeatureExtractor()
         searcher = Searcher(
                 MEDIA_ROOT.__str__(),
                 BASE_DIR / "index.csv",
                 bins
         )
 
-        features = clr_dsc.describe(query)
+        features = feature_extractor.describe(query)
         results = searcher.search(features)
 
         print(f"DEBUG: {BASE_DIR / 'index.csv'}")

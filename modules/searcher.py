@@ -12,13 +12,13 @@ import csv
 import os
 
 class Searcher:
-    def __init__(self, photo_dir: str, index_path: str, bins: tuple[int, int, int]) -> None:
+    def __init__(self, photo_dir: str, index_path: str) -> None:
         self.index_path = index_path
         self.photo_dir = photo_dir
-        self.init_index(bins)
+        self.init_index()
 
-    def init_index(self, bins: tuple[int, int, int]) -> None:
-        indexer = Indexer(bins)
+    def init_index(self) -> None:
+        indexer = Indexer()
 
         if not os.path.isfile(self.index_path):
             indexer.index_images(self.photo_dir, self.index_path)
@@ -65,14 +65,13 @@ if __name__ == "__main__":
     matched_photos = []
 
     bins = (8, 12, 3)
-    clr_dsc = FeatureExtractor(bins)
+    feature_extractor = FeatureExtractor()
     searcher = Searcher(
             MEDIA_ROOT.__str__(),
             BASE_DIR / "index.csv",
-            bins
     )
 
-    features = clr_dsc.describe(query)
+    features = feature_extractor.describe(query)
     results = searcher.search(features)
 
     print(f"INFO: index path: {BASE_DIR / 'index.csv'}")
