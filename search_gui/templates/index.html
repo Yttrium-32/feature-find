@@ -27,8 +27,8 @@
             </form>
 
             <!-- Uploaded Image -->
-            <h3 class="text-center">Your Uploaded Image</h3>
             {% if uploaded_image_url %}
+                <h3 class="text-center">Your Uploaded Image</h3>
                 <div class="row mb-5">
                     <div class="col-md-6 mx-auto">
                         <img src="{{ uploaded_image_url }}" alt="Uploaded Image" class="img-fluid d-block mx-auto">
@@ -37,17 +37,19 @@
             {% endif %}
 
             <!-- Processed Images -->
-            <h3 class="text-center">Processed Result Images</h3>
-            {% if result_images %}
-                <div class="row">
-                    {% for img_url in result_images %}
-                        <div class="col-md-3 mb-3">
-                            <img src="{{ img_url }}" alt="Result" class="img-thumbnail">
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>No results yet.</p>
+            {% if uploaded_image_url %}
+                <h3 class="text-center">Processed Result Images</h3>
+                {% if result_images %}
+                    <div class="row">
+                        {% for img_url in result_images %}
+                            <div class="col-md-3 mb-3">
+                                <img src="{{ img_url }}" alt="Result" class="img-thumbnail">
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No results found.</p>
+                {% endif %}
             {% endif %}
 
         </div>
