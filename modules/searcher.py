@@ -1,9 +1,12 @@
+from image_matcher.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
 from modules.colordescriptor import ColorDescriptor
 from modules.index import Indexer
 
+import cv2
 import numpy
-import csv
 
+import argparse
+import csv
 import os
 
 class Searcher:
@@ -41,4 +44,34 @@ class Searcher:
         results = sorted(results.items(), key=lambda item: item[1])
 
         return results[:limit]
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+            "-q", "--query",
+            required = True,
+            help = "Path to the image to be queried"
+    )
+
+    args = vars(ap.parse_args())
+
+    query = cv2.imread(args["query"])
+    matched_photos = []
+
+    clr_dsc = ColorDescriptor((8, 12, 3))
+    searcher = Searcher(
+            MEDIA_ROOT.__str__(),
+            BASE_DIR / "index.csv",
+            clr_dsc
+    )
+
+    features = clr_dsc.describe(query)
+    results = searcher.search(features)
+
+    print(f"INFO: index path: {BASE_DIR / 'index.csv'}")
+    for (result_id, score) in results:
+        print(f"INFO: {result_id=}, {score=}")
+        matched_photos.append(f"{MEDIA_URL}{result_id}")
+
+    print(f"DEBUG: {matched_photos=}")
 
