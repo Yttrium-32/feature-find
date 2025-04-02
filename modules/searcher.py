@@ -2,6 +2,8 @@ from image_matcher.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
 from modules.colordescriptor import ColorDescriptor
 from modules.index import Indexer
 
+from sklearn.metrics.pairwise import cosine_similarity
+
 import cv2
 import numpy
 
@@ -37,11 +39,15 @@ class Searcher:
 
             for row in csv_file:
                 features = [float(x) for x in row[1:]]
-                d = self.chi2_distance(features, query_features)
+
+                vec_db = numpy.array(features).reshape(1, -1)
+                vec_query = numpy.array(query_features).reshape(1, -1)
+
+                d = cosine_similarity(vec_db, vec_query)[0][0]
 
                 results[row[0]] = d
 
-        results = sorted(results.items(), key=lambda item: item[1])
+        results = sorted(results.items(), key=lambda item: item[1], reverse=True)
 
         return results[:limit]
 
