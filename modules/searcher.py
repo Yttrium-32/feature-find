@@ -45,6 +45,9 @@ class Searcher:
 
                 d = cosine_similarity(vec_db, vec_query)[0][0]
 
+                if d < 0.5:
+                    continue
+
                 results[row[0]] = d
 
         results = sorted(results.items(), key=lambda item: item[1], reverse=True)
