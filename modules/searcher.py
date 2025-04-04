@@ -32,10 +32,8 @@ class Searcher:
         return (sim, image_idx)
 
     def match_label(self, image_label, query_label):
-        if image_label == query_label:
-            return True
-        else:
-            return False
+        print(f"[MATCH_LABEL] Comparing: '{image_label}' == '{query_label}' => {image_label == query_label}")
+        return image_label == query_label
 
     def search(self, query_features, query_label, limit: int = 10):
         results = []
@@ -70,19 +68,14 @@ class Searcher:
 
         # Furthur refine search by matching labels
         with ThreadPoolExecutor() as executor:
-            futures = [
-                    executor.submit(
-                        self.match_label,
-                        item["label"],
-                        query_label,
-                    )
-                    for item in results
-            ]
+            matches = executor.map(
+                    lambda item: self.match_label(item["label"], query_label),
+                    results
+            )
 
         refined_results = []
-        for future, item in zip(as_completed(futures), results):
-            label_match = future.result()
-            if label_match:
+        for match, item in zip(matches, results):
+            if match:
                 image_name = item["image_name"]
                 image_sim = item["similarity"]
                 image_label = item["label"]
