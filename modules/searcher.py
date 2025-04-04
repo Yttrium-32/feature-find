@@ -1,4 +1,4 @@
-from image_matcher.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
+from image_matcher.settings import BASE_DIR, INDEX_FILE, MEDIA_ROOT, MEDIA_URL
 from modules.feature_extractor import FeatureExtractor
 from modules.index import Indexer
 
@@ -76,13 +76,13 @@ if __name__ == "__main__":
     feature_extractor = FeatureExtractor()
     searcher = Searcher(
             MEDIA_ROOT.__str__(),
-            BASE_DIR / "index.hdf5",
+            INDEX_FILE,
     )
 
     features = feature_extractor.describe(query)
     results = searcher.search(features)
 
-    print(f"INFO: index path: {BASE_DIR / 'index.hdf5'}")
+    print(f"INFO: index path: { BASE_DIR / INDEX_FILE }")
     for (result_id, score) in results:
         print(f"INFO: {result_id=}, {score=}")
         matched_photos.append(f"{MEDIA_URL}{result_id}")

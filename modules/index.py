@@ -1,5 +1,5 @@
 from modules.feature_extractor import FeatureExtractor
-from image_matcher.settings import BASE_DIR
+from image_matcher.settings import INDEX_FILE
 
 import os
 import argparse
@@ -59,9 +59,7 @@ if __name__ == "__main__":
             help = "Path to the directory that contains the images to be indexed"
     )
 
-    index_file = BASE_DIR / "index.hdf5"
-
     args = vars(ap.parse_args())
 
-    indexer.index_images(args["dataset"], index_file)
+    indexer.index_images(args["dataset"], INDEX_FILE)
 

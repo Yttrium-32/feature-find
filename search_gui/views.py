@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from modules.searcher import Searcher
 from modules.feature_extractor import FeatureExtractor
 
-from image_matcher.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
+from image_matcher.settings import INDEX_FILE, MEDIA_ROOT, MEDIA_URL
 
 def search_gui(request: HttpRequest):
     uploaded_image = None
@@ -25,13 +25,13 @@ def search_gui(request: HttpRequest):
         feature_extractor = FeatureExtractor()
         searcher = Searcher(
                 MEDIA_ROOT.__str__(),
-                BASE_DIR / "index.csv",
+                INDEX_FILE,
         )
 
         features = feature_extractor.describe(query)
         results = searcher.search(features)
 
-        print(f"DEBUG: {BASE_DIR / 'index.csv'}")
+        print(f"DEBUG: { INDEX_FILE }")
         for (result_id, score) in results:
             print(f"DEBUG: {result_id=}, {score=}")
             matched_photos.append(f"{MEDIA_URL}{result_id}")

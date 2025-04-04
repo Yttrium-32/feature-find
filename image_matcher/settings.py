@@ -16,6 +16,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = BASE_DIR / 'photos'
 MEDIA_URL = '/media/'
+INDEX_FILE = BASE_DIR / 'index.hdf5'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
