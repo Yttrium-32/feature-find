@@ -17,14 +17,15 @@ class Indexer:
         image_paths = glob.glob(os.path.join(photos_dir, "*.jpg"))
         num_images = len(image_paths)
 
-        feature_dim = self.process_image(image_paths[0]).shape[0]
+        example_features, _ = self.process_image(image_paths[0])
+        feature_dim = example_features.shape[0]
 
         with h5py.File(index_file_path, "w") as index_file:
-            name_dt = h5py.string_dtype(encoding="utf-8")
+            str_dt = h5py.string_dtype(encoding="utf-8")
             index_file.create_dataset(
                     "image_names",
                     shape=(num_images,),
-                    dtype=name_dt
+                    dtype=str_dt
             )
 
             index_file.create_dataset(
@@ -33,21 +34,28 @@ class Indexer:
                     dtype=numpy.float32
             )
 
+            index_file.create_dataset(
+                    "labels",
+                    shape=(num_images,),
+                    dtype=str_dt
+            )
+
             for idx, image_path in enumerate(image_paths):
-                features = self.process_image(image_path)
+                features, label = self.process_image(image_path)
                 image_name = os.path.basename(image_path)
                 index_file["features"][idx] = features
                 index_file["image_names"][idx] = image_name
+                index_file["labels"][idx] = label
 
-    def process_image(self, image_path: str) -> str:
+    def process_image(self, image_path: str):
         image_name = image_path.split("/")[-1]
 
         print(f"INFO: Processing \'{image_name}\'...")
 
         image = cv2.imread(image_path)
-        features = self.feature_extractor.describe(image)
+        features, label = self.feature_extractor.describe(image)
 
-        return features
+        return features, label
 
 if __name__ == "__main__":
     indexer = Indexer()

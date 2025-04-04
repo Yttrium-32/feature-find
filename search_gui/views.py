@@ -28,15 +28,16 @@ def search_gui(request: HttpRequest):
                 INDEX_FILE,
         )
 
-        features = feature_extractor.describe(query)
-        results = searcher.search(features)
+        features, label = feature_extractor.describe(query)
+        results = searcher.search(features, label)
 
         print(f"DEBUG: { INDEX_FILE }")
-        for (result_id, score) in results:
-            print(f"DEBUG: {result_id=}, {score=}")
+        for result_id, result_sim, result_label in results:
+            print(f"DEBUG: {result_id=}, {result_sim=}, {result_label=}")
             matched_photos.append(f"{MEDIA_URL}{result_id}")
 
         print(f"DEBUG: {matched_photos=}")
+        print(f"DEBUG: Extracted label: { label }")
 
     return render(request, 'index.html', {
         'uploaded_image_url': uploaded_image,

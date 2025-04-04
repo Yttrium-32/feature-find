@@ -23,41 +23,72 @@ class Searcher:
         if not os.path.isfile(self.index_path):
             indexer.index_images(self.photo_dir, self.index_path)
 
-    def compute_cos_sim(self, image_name, image_features, query_features):
+    def compute_cos_sim(self, image_idx, image_features, query_features):
         vec_image = numpy.array(image_features).reshape(1, -1)
         vec_query = numpy.array(query_features).reshape(1, -1)
 
         sim = cosine_similarity(vec_image, vec_query)[0][0]
 
-        if sim > 0.5:
-            return (image_name, sim)
-        return None
+        return (sim, image_idx)
 
+    def match_label(self, image_label, query_label):
+        if image_label == query_label:
+            return True
+        else:
+            return False
 
-    def search(self, query_features, limit: int = 10):
+    def search(self, query_features, query_label, limit: int = 10):
         results = []
 
         with h5py.File(self.index_path, "r") as index_file:
             all_features = index_file["features"][:]
             image_names = index_file["image_names"][:]
+            image_labels = index_file["labels"][:]
 
+            # Extract images with similar features
             with ThreadPoolExecutor() as executor:
                 futures = [
                     executor.submit(
                         self.compute_cos_sim,
-                        image_names[idx],
+                        idx,
                         all_features[idx],
                         query_features
                     )
                     for idx in range(all_features.shape[0])
                 ]
                 for future in as_completed(futures):
-                    res = future.result()
-                    if res:
-                        results.append(res)
+                    sim, image_idx = future.result()
+                    if sim > 0.5:
+                        results.append({
+                            "image_name": image_names[image_idx].decode(),
+                            "similarity": sim,
+                            "features": all_features[image_idx],
+                            "label": image_labels[image_idx].decode()
+                        })
 
-        results.sort(key=lambda item: item[1], reverse=True)
-        return results[:limit]
+        results.sort(key=lambda item: item["similarity"], reverse=True)
+
+        # Furthur refine search by matching labels
+        with ThreadPoolExecutor() as executor:
+            futures = [
+                    executor.submit(
+                        self.match_label,
+                        item["label"],
+                        query_label,
+                    )
+                    for item in results
+            ]
+
+        refined_results = []
+        for future, item in zip(as_completed(futures), results):
+            label_match = future.result()
+            if label_match:
+                image_name = item["image_name"]
+                image_sim = item["similarity"]
+                image_label = item["label"]
+                refined_results.append((image_name, image_sim, image_label))
+
+        return refined_results[:limit]
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
@@ -79,13 +110,14 @@ if __name__ == "__main__":
             INDEX_FILE,
     )
 
-    features = feature_extractor.describe(query)
-    results = searcher.search(features)
+    features, label = feature_extractor.describe(query)
+    results = searcher.search(features, label)
 
     print(f"INFO: index path: { BASE_DIR / INDEX_FILE }")
     for (result_id, score) in results:
         print(f"INFO: {result_id=}, {score=}")
         matched_photos.append(f"{MEDIA_URL}{result_id}")
 
+    print(f"INFO: Extracted label: {label}")
     print(f"DEBUG: {matched_photos=}")
 
