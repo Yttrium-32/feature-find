@@ -9,7 +9,10 @@ class FeatureExtractor:
         self.base_model = ResNet50(weights='imagenet')
         self.model = Model(
             inputs=self.base_model.input,
-            outputs=self.base_model.get_layer('avg_pool').output
+            outputs=[
+                self.base_model.get_layer('avg_pool').output,
+                self.base_model.output
+            ]
         )
 
     def describe(self, image):
@@ -17,11 +20,10 @@ class FeatureExtractor:
         image_array = numpy.expand_dims(image_resized, axis=0).astype(numpy.float32)
         image_array = preprocess_input(image_array)
 
-        features = self.model.predict(image_array, verbose=0).flatten()
+        features, prediction = self.model.predict(image_array, verbose=0)
 
-        prediction = self.base_model.predict(image_array, verbose=0)
         decoded_pred = decode_predictions(prediction, top=1)[0][0]
         label = decoded_pred[1]
 
-        return features, label
+        return features.flatten(), label
 
