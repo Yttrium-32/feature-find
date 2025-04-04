@@ -162,6 +162,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
+    { name = "h5py" },
     { name = "opencv-python" },
     { name = "scikit-learn" },
     { name = "tensorflow", extra = ["and-cuda"] },
@@ -170,6 +171,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=5.2.3" },
+    { name = "h5py", specifier = ">=3.14.0" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "scikit-learn", specifier = ">=1.7.0" },
     { name = "tensorflow", extras = ["and-cuda"], specifier = ">=2.19.0" },

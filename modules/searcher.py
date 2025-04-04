@@ -5,10 +5,10 @@ from modules.index import Indexer
 from sklearn.metrics.pairwise import cosine_similarity
 import cv2
 import numpy
+import h5py
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import argparse
-import csv
 import os
 
 class Searcher:
@@ -23,29 +23,33 @@ class Searcher:
         if not os.path.isfile(self.index_path):
             indexer.index_images(self.photo_dir, self.index_path)
 
-    def compute_cos_sim(self, row, query_features):
-        features = [float(x) for x in row[1:]]
-
-        vec_db = numpy.array(features).reshape(1, -1)
+    def compute_cos_sim(self, image_name, image_features, query_features):
+        vec_image = numpy.array(image_features).reshape(1, -1)
         vec_query = numpy.array(query_features).reshape(1, -1)
 
-        d = cosine_similarity(vec_db, vec_query)[0][0]
+        sim = cosine_similarity(vec_image, vec_query)[0][0]
 
-        if d > 0.5:
-            return (row[0], d)
+        if sim > 0.5:
+            return (image_name, sim)
         return None
 
 
     def search(self, query_features, limit: int = 10):
         results = []
 
-        with open(self.index_path) as index_file:
-            csv_file = csv.reader(index_file)
+        with h5py.File(self.index_path, "r") as index_file:
+            all_features = index_file["features"][:]
+            image_names = index_file["image_names"][:]
 
             with ThreadPoolExecutor() as executor:
                 futures = [
-                    executor.submit(self.compute_cos_sim, row, query_features)
-                    for row in csv_file
+                    executor.submit(
+                        self.compute_cos_sim,
+                        image_names[idx],
+                        all_features[idx],
+                        query_features
+                    )
+                    for idx in range(all_features.shape[0])
                 ]
                 for future in as_completed(futures):
                     res = future.result()
@@ -72,13 +76,13 @@ if __name__ == "__main__":
     feature_extractor = FeatureExtractor()
     searcher = Searcher(
             MEDIA_ROOT.__str__(),
-            BASE_DIR / "index.csv",
+            BASE_DIR / "index.hdf5",
     )
 
     features = feature_extractor.describe(query)
     results = searcher.search(features)
 
-    print(f"INFO: index path: {BASE_DIR / 'index.csv'}")
+    print(f"INFO: index path: {BASE_DIR / 'index.hdf5'}")
     for (result_id, score) in results:
         print(f"INFO: {result_id=}, {score=}")
         matched_photos.append(f"{MEDIA_URL}{result_id}")
