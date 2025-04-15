@@ -32,7 +32,6 @@ class Searcher:
         return (sim, image_idx)
 
     def match_label(self, image_label, query_label):
-        print(f"[MATCH_LABEL] Comparing: '{image_label}' == '{query_label}' => {image_label == query_label}")
         return image_label == query_label
 
     def search(self, query_features, query_label, limit: int = 10):
