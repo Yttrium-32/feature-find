@@ -9,6 +9,8 @@ from modules.feature_extractor import FeatureExtractor
 
 from image_matcher.settings import INDEX_FILE, MEDIA_ROOT, MEDIA_URL
 
+feature_extractor = FeatureExtractor()
+
 def search_gui(request: HttpRequest):
     uploaded_image = None
     matched_photos = []
@@ -22,10 +24,9 @@ def search_gui(request: HttpRequest):
         saved_image_path = fs.path(filename)
         query = cv2.imread(saved_image_path)
 
-        feature_extractor = FeatureExtractor()
         searcher = Searcher(
-                MEDIA_ROOT.__str__(),
-                INDEX_FILE,
+            MEDIA_ROOT.__str__(),
+            INDEX_FILE,
         )
 
         features, label = feature_extractor.describe(query)
