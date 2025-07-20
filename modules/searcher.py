@@ -1,4 +1,4 @@
-from image_matcher.settings import BASE_DIR, INDEX_FILE, MEDIA_ROOT, MEDIA_URL
+from feature_find.settings import BASE_DIR, INDEX_FILE, MEDIA_ROOT, MEDIA_URL
 from modules.feature_extractor import FeatureExtractor
 from modules.index import Indexer
 

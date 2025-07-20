@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from modules.searcher import Searcher
 from modules.feature_extractor import FeatureExtractor
 
-from image_matcher.settings import INDEX_FILE, MEDIA_ROOT, MEDIA_URL
+from feature_find.settings import INDEX_FILE, MEDIA_ROOT, MEDIA_URL
 
 feature_extractor = FeatureExtractor()
 

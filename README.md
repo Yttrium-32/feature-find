@@ -1,4 +1,4 @@
-# Image Matcher
+# Feature Find
 A web application written in [Django](https://www.djangoproject.com/) that
 leverages the power of ResNet to reverse image search through your local
 directory of images.

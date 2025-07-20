@@ -1,5 +1,5 @@
 from modules.feature_extractor import FeatureExtractor
-from image_matcher.settings import INDEX_FILE
+from feature_find.settings import INDEX_FILE
 
 import os
 import argparse

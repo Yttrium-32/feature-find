@@ -1,5 +1,5 @@
 """
-WSGI config for image_matcher project.
+WSGI config for feature_find project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'image_matcher.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'feature_find.settings')
 
 application = get_wsgi_application()

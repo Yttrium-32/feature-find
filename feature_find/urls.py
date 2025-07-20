@@ -1,5 +1,5 @@
 """
-URL configuration for image_matcher project.
+URL configuration for feature_find project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import path, include
 
-from image_matcher.settings import MEDIA_ROOT, MEDIA_URL
+from feature_find.settings import MEDIA_ROOT, MEDIA_URL
 
 urlpatterns = [
     path('', include('search_gui.urls')),
